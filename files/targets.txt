@@ -1,0 +1,10 @@
+samplename	filename	condition	paired	stranded
+WT_1	HOME/tutorial/bam/WT_1.bam	WT	single	forward
+WT_2	HOME/tutorial/bam/WT_2.bam	WT	single	forward
+WT_3	HOME/tutorial/bam/WT_3.bam	WT	single	forward
+BB_1	HOME/tutorial/bam/BB_1.bam	BB	single	forward
+BB_2	HOME/tutorial/bam/BB_2.bam	BB	single	forward
+BB_3	HOME/tutorial/bam/BB_2.bam	BB	single	forward
+ERP_1	HOME/tutorial/bam/ERP_1.bam	ERP	single	forward
+ERP_2	HOME/tutorial/bam/ERP_2.bam	ERP	single	forward
+ERP_3	HOME/tutorial/bam/ERP_3.bam	ERP	single	forward

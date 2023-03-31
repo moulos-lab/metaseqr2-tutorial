@@ -46,7 +46,6 @@ metaseqr2(
 # model we just created to avoid many recalculations (counting)
 theContrasts <- "ERP_vs_BB_vs_WT"
 
-
 # The gene model is provided through the counts argument
 geneModelFile <- file.path(HOME,"tutorial","analysis_1","data",
     "gene_model.RData")

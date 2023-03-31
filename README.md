@@ -235,6 +235,8 @@ theContrasts <- c(
 
 ### Run the metaseqR2 pipeline
 
+#### Basic run
+
 You can paste the following command in R's environment which will execute a
 metaseqR2 pipeline:
 
@@ -282,13 +284,238 @@ calculation (ratios of gene expression between two conditions), `ConditionB` is
 always the denominator. So, `BB_vs_WT` means that the algorithm will seek 
 differentially expressed genes betwee `BB` and `WT` and the fold change (up- or
 down-regulation) is `BB/WT`.
+* `org="hg19"`: A character denoting which organism should metaseqR2 consider as 
+the reference organism (and genome version). See the documentation for the 
+supported organisms and how they are provided. In this case it's the human 
+genome version "hg19".
+* `countType="exon"`: Where should the read counting take place? This depends on
+the RNA-Seq protocol. The classic protocol measures the abundance of 
+polyadenylated, that is transcribed RNAs (mRNAs). So counting should take place
+over exons, hence `countType="exon"`. If the protocol measures total RNA, then
+the counting should take place over the whole gene body. See the documentation
+for a list of available modes.
+* `normalization="deseq2"`: Which normalization algorithm should be applied?
+* `statistics="deseq2"`: Which of the supported differential expression tests
+should be performed?
+* `figFormat="png"`: metaseqR2 creates a directory with the run results, among
+which a lot are figures. Apart from their interactive form in the report, they
+can be exported in various formats. If we don't specify which, all of them will
+be exported (we usually don't want that).
+* `qcPlots=c(...)`: Which diagnostic plots to report. Some combinations of plots
+and comparisons are not feasible. metaseqR2 detects them, warns the user and
+then removes them from the list of plots.
+* `exportWhere=...`: A directory to write the pipeline results.
+* `pcut=0.05`: A p-value cutoff to report statistically significant results.
+These are written in text files in the results directory and are downloadable
+from the report. Note that the interactive table in the report contains only
+the top scoring genes (controlled by the `reportTop` variable below).
+* `restrictCores=0.25`: If the pipeline is running in a system with multiple
+cores, the how many to use for parallel computations, when possible (e.g. 
+counting). Not available on Windows.
+* `exportWhat=c(...)`: The pipeline calculates *a lot* of possible values with
+respect to gene expression. The most important ones are annotation elements,
+statistical scores (p-values and FDRs) and fold changes. See documentation for
+all possibilities.
+* `exportScale=c(...)`: What scale to use? Natural (read counts as they are),
+log<sub>2</sub> transformed?
+* `exportValues="normalized"`: How should all the metrics be calculated? Based
+on raw on normalized read counts. Both options are available at the same time.
+* `saveGeneModel=TRUE`: This saves the counting and exon summarization results
+in an R data file which can be used for additional analyses and re-analyses.
+* `reportTop=0.1`: See `pcut` above.
+* `localDb=...`: The annotation database. If not provided, metaseqR2 will look
+at a default location and if not found, annotation will be downloaded 
+on-the-fly.
 
+Detailed lists of differentially expressed genes can be downloaded from the
+*Results* section of the report. These are tab-delimited text files which can
+be opened in any editor and also Excel. You can download a formatted example
+from the `files` directory of this repository or [here](#).
 
+#### Run for a non-pairwise comparison
 
-# Bonus! BAM stats
+Apart from pairwise comparisons, metaseqR2 can be used for ANOVA-like 
+comparisons where we look for genes that differ in at least one of more than two
+conditions. Not all included tests support this. For this reason, metaseqR2 does
+not currently support more complex statistical designs.
 
-##
+We execute another run with an ANOVA-like design with less plots (not needed 
+since we created them before) and using the gene model we just created to avoid 
+many recalculations (counting and summarizing):
 
+```
+# Run with an ANOVA-like design (genes that differ in at least one condition)
+# with less plots (not needed since we created them before) and using the gene
+# model we just created to avoid many recalculations (counting)
+theContrasts <- "ERP_vs_BB_vs_WT"
+
+# The gene model is provided through the counts argument
+geneModelFile <- file.path(HOME,"tutorial","analysis_1","data",
+    "gene_model.RData")
+
+# Run
+metaseqr2(
+    counts=geneModelFile,
+    contrast=theContrasts,
+    org="hg19",
+    countType="exon",
+    normalization="deseq2",
+    statistics="deseq2",
+    figFormat="png",
+    qcPlots="mds",
+    exportWhere=file.path(HOME,"tutorial","analysis_2"),
+    pcut=0.05,
+    restrictCores=0.25,
+    exportWhat=c("annotation","p_value","adj_p_value","fold_change",
+        "counts","flags"),
+    exportScale=c("natural","log2","rpgm"),
+    exportValues="normalized",
+    saveGeneModel=TRUE,
+    reportTop=0.1,
+    localDb=file.path(HOME,"tutorial","annotation.sqlite")
+)
+```
+
+#### Remove one sample from the analysis
+
+We saw before that WT_2 clustered a bit differently with respect to correlation
+with the other samples from WT condition. Let's see what happens when we remove
+it:
+
+```
+# Let's see what will happen if we remove one sample (WT_2). This can be done
+# by providing a list with the conditions and samples to be excluded. The name
+# of the list member is the condition, while the member is the sample
+excludeSample <- list(WT="WT_2")
+
+# Define again the first comparisons
+theContrasts <- c(
+    "BB_vs_WT",
+    "ERP_vs_WT",
+    "ERP_vs_BB"
+)
+
+# Run
+metaseqr2(
+    counts=geneModelFile,
+    excludeList=excludeSample,
+    contrast=theContrasts,
+    org="hg19",
+    countType="exon",
+    normalization="edger",
+    statistics="edger",
+    figFormat="png",
+    qcPlots=c("mds","boxplot","volcano"),
+    exportWhere=file.path(HOME,"tutorial","analysis_3"),
+    pcut=0.05,
+    restrictCores=0.25,
+    exportWhat=c("annotation","p_value","adj_p_value","fold_change","counts"),
+    exportScale=c("natural","log2","rpgm"),
+    exportValues="normalized",
+    saveGeneModel=TRUE,
+    reportTop=0.1,
+    localDb=file.path(HOME,"tutorial","annotation.sqlite")
+)
+```
+
+There is a new argument here:
+* `excludeList`: This instructs the pipeline to ignore a sample either from a
+precalculated gene model data file, or from a targets file.
+
+We can now inspect the report.
+
+#### The PANDORA algorithm
+
+The power of metaseqR2 is the PANDORA algorithm. Let's try it with 5 out of 9
+supported tests. The report adjusts accordingly by reporting the numbers 
+returned by each algorithm separately as well as the results obtained with
+PANDORA.
+
+PANDORA works with precalculated p-value weights for each organism, available
+within the package. Then we instruct metaseqR2 to calculate the PANDORA p-values
+as adjusted p-values:
+
+```
+# We need to get the pre-calculated p-value weights for human
+weights <- getWeights("human")
+
+# The selection about calculating PANDORA p-values is controlled by the metaP
+# argument.
+panp <- "pandora"
+```
+
+Then, the run:
+
+```
+metaseqr2(
+    counts=geneModelFile,
+    contrast=theContrasts,
+    org="hg19",
+    countType="exon",
+    normalization="deseq2",
+    statistics=c("deseq2","edger","noiseq","limma","absseq"),
+    metaP=panp,
+    weight=weights,
+    figFormat="png",
+    qcPlots=c("mds","boxplot","volcano","statvenn"),
+    exportWhere=file.path(HOME,"tutorial","analysis_4"),
+    pcut=0.05,
+    restrictCores=0.25,
+    exportWhat=c("annotation","p_value","adj_p_value","meta_p_value",
+        "adj_meta_p_value","fold_change","counts"),
+    exportScale=c("natural","log2","rpgm"),
+    exportValues="normalized",
+    saveGeneModel=TRUE,
+    reportTop=0.1,
+    localDb=file.path(HOME,"tutorial","annotation.sqlite")
+)
+```
+
+Notice the two additional values in `exportWhat`:
+
+* `"meta_p_value"`: This will export the PANDORA p-values, as just `p_value`
+will only export the p-values from each test performed.
+* `"adj_meta_p_value"`: FDR based on the PANDORA p-values.
+
+Let's explore the report.
+
+You can download an Excel file with the PANDORA results from the `files` 
+directory of this repository or [here](#)
+
+## Bonus! BAM stats
+
+As a bonus, if time left, we can calculate read count statistics from BAM files
+that help assess the overall quality of the mapping. For this, we need the 
+targets file we used for the differential expression analysis and a small 
+library hosted on GitHub. We also (optionally) need a description of the main
+target areas (in this case exons) to calculate stats over these. This
+description is essentially a list pointing to a metaseqR2 database. If there is
+no database available, the description (`ref` argument) can be a 
+[BED](https://genome.ucsc.edu/FAQ/FAQformat.html#format1) file (just the first
+three columns are enough).
+
+```
+library(parallel)
+library(Rsamtools)
+library(GenomicAlignments)
+library(openxlsx)
+
+# The script
+source("https://github.com/moulos-lab/genomics-facility-processes/raw/main/bamstats.R")
+
+# Reference annotation to use for getting stats at areas of interest (exons)
+ref <- list(
+    org="hg19",
+    refdb="ensembl",
+    version="auto", # Optional
+    countType="exon",
+    localDb=file.path(HOME,"tutorial","annotation.sqlite")
+)
+
+stats <- getBamStats(targetsFile,ref=ref,rc=0.25)
+```
+
+You can also get the output from [here]()
 
 
 

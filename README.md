@@ -330,7 +330,8 @@ on-the-fly.
 Detailed lists of differentially expressed genes can be downloaded from the
 *Results* section of the report. These are tab-delimited text files which can
 be opened in any editor and also Excel. You can download a formatted example
-from the `files` directory of this repository or [here](#).
+from the `files` directory of this repository or 
+[here](https://github.com/moulos-lab/metaseqr2-tutorial/raw/main/files/metaseqr_sig_out_BB_vs_WT.xlsx).
 
 #### Run for a non-pairwise comparison
 
@@ -480,7 +481,8 @@ will only export the p-values from each test performed.
 Let's explore the report.
 
 You can download an Excel file with the PANDORA results from the `files` 
-directory of this repository or [here](#)
+directory of this repository or 
+[here](https://github.com/moulos-lab/metaseqr2-tutorial/raw/main/files/metaseqr_sig_out_BB_vs_WT_PANDORA.xlsx)
 
 ## Bonus! BAM stats
 
@@ -515,18 +517,6 @@ ref <- list(
 stats <- getBamStats(targetsFile,ref=ref,rc=0.25)
 ```
 
-You can also get the output from [here]()
-
-
-
-
-
-
-
-
-
-
-
-
-
+You can also get the output from 
+[here](https://github.com/moulos-lab/metaseqr2-tutorial/raw/main/files/alignment_statistics_2023-03-31-19-57-03.xlsx)
 

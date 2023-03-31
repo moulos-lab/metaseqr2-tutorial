@@ -115,7 +115,8 @@ wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3
 wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367904.bam.bai -O ERP_1.bam.bai
 wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367905.bam -O ERP_2.bam
 wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367905.bam.bai -O ERP_2.bam.bai
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367906.bam
+wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367906.bam -O ERP_3.bam
+wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367906.bam.bai -O ERP_3.bam.bai
 
 cd ..
 ```
@@ -146,7 +147,8 @@ tutorial in the `files` directory of this repository. You must change the `HOME`
 text with your working directory as mentioned above.
 
 ```
-
+# Always in the tutorial directory
+wget https://github.com/moulos-lab/metaseqr2-tutorial/raw/main/files/targets.txt
 ```
 
 ## Annotation
@@ -166,9 +168,138 @@ If we wish to analyze data from a non-supported organism, metaseqR2 can also
 accept a [GTF](https://www.ensembl.org/info/website/upload/gff.html) describing
 the genome under investigation. We will not cover this case here.
 
- 
+You can download the database as follows:
+
+```
+# Always in the tutorial directory
+wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/annotation.sqlite
+```
+
+## Performing differential expression analysis
+
+metaseqR2 offers a complete end-to-end pipeline for 
+
+* Read counting
+* Data QC filtering
+* Normalization
+* Differential expression analysis
+* Reporting and visualization
+
+As such, the central command used to run the pipeline has many arguments that
+control input options, filtering, differential expression and what will be the
+output. Not all of them can be covered here but complete explanations can be
+found in the package documentation.
+
+### Preliminaries
+
+Firstly start R and load the metaseqR2 library:
+
+```
+library(metaseqR2)
+```
+
+All the exported functions (functions that can be used by the R session user)
+are documented and help can be found:
+
+```
+help(metaseqr2)
+# or ?metaseqr2
+
+help(normalizeDeseq2)
+# or ?normalizeDeseq2
+```
+
+### Define the targets file
+
+We create a variable pointing to the targets file we created:
+
+```
+targetsFile <- file.path(HOME,"tutorial","targets.txt")
+```
+
+### Define the comparisons
+
+Let's perform three comparisons of the "treatments":
+
+* Challenge with *Borrelia burgdoferi* against Wild Type (`BB_vs_WT`)
+* Treatment with its Erp23 ligand (`ERP_vs_WT`)
+* Treatment with the Erp23 ligand agains *Borrelia burgdoferi* (`ERP_vs_BB`)
+
+```
+theContrasts <- c(
+    "BB_vs_WT",
+    "ERP_vs_WT",
+    "ERP_vs_BB"
+)
+```
+
+### Run the metaseqR2 pipeline
+
+You can paste the following command in R's environment which will execute a
+metaseqR2 pipeline:
+
+```
+metaseqr2(
+    sampleList=targetsFile,
+    contrast=theContrasts,
+    org="hg19",
+    countType="exon",
+    normalization="deseq2",
+    statistics="deseq2",
+    figFormat="png",
+    qcPlots=c(
+        "mds","biodetection","countsbio","saturation","readnoise","filtered",
+        "correl","boxplot","meandiff","meanvar","deheatmap","volcano","mastat",
+        "foldvenn"
+    ),
+    exportWhere=file.path(HOME,"tutorial","analysis_1"),
+    pcut=0.05,
+    restrictCores=0.25,
+    exportWhat=c("annotation","p_value","adj_p_value","fold_change",
+        "counts","flags"),
+    exportScale=c("natural","log2","rpgm"),
+    exportValues="normalized",
+    saveGeneModel=TRUE,
+    reportTop=0.1,
+    localDb=file.path(HOME,"tutorial","annotation.sqlite")
+)
+```
+
+After finishing, you should be able to see a new directory named `analysis_1`
+in your `HOME/tutorial` directory. Before inspecting the report, let's take a
+look at each parameter in the command above:
+
+* `sampleList=targetsFile`: The `sampleList` argument can be a list defining the
+conditions and samples in the experiments (please look at metaseqR2 
+documentation for its definition). It can also be a file defining these samples
+(the targets file). If it's a list, it should be accompanied by a pre-calculated
+count matrix and not a targets file with the BAM files. In this case, we are
+giving the targets file we defined above.
+* `contrast=theContrasts`: This defines the comparisons to be performed. It has
+a special syntax, specifically condition names separated by `_vs_`. For pairwise
+comparisons, it should be `ConditonA_vs_ConditionB`. Regarding fold change
+calculation (ratios of gene expression between two conditions), `ConditionB` is
+always the denominator. So, `BB_vs_WT` means that the algorithm will seek 
+differentially expressed genes betwee `BB` and `WT` and the fold change (up- or
+down-regulation) is `BB/WT`.
+
 
 
 # Bonus! BAM stats
 
 ##
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

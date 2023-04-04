@@ -121,6 +121,42 @@ wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3
 cd ..
 ```
 
+If you are running in a Windows system, you should create a folder called `bam`
+in the `tutorial` folder and then open R (e.g. RStudio) and navigate to this
+folder. Then you can use the `download.file()` R function:
+
+```
+# WT conditions
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367907.bam","WT_1.bam")
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367907.bam.bai","WT_1.bam.bai")
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367908.bam","WT_2.bam")
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367908.bam.bai","WT_2.bam.bai")
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367909.bam","WT_3.bam")
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367909.bam.bai","WT_3.bam.bai")
+
+# BB condition
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367901.bam","BB_1.bam")
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367901.bam.bai","BB_1.bam.bai")
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367902.bam","BB_2.bam")
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367902.bam.bai","BB_2.bam.bai")
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367903.bam","BB_3.bam") 
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367903.bam.bai","BB_3.bam.bai") 
+
+# ERP condition
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367904.bam","ERP_1.bam")
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367904.bam.bai","ERP_1.bam.bai")
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367905.bam","ERP_2.bam") 
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367905.bam.bai","ERP_2.bam.bai") 
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367906.bam","ERP_3.bam")
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367906.bam.bai","ERP_3.bam.bai")
+```
+
+Then, within R, go to up one level to the `tutorial` directory:
+
+```
+setwd("../")
+```
+
 ## Targets file
 
 The targets file required by metaseqR2 pipeline is a simple text tab-delimited
@@ -149,6 +185,9 @@ text with your working directory as mentioned above.
 ```
 # Always in the tutorial directory
 wget https://github.com/moulos-lab/metaseqr2-tutorial/raw/main/files/targets.txt
+
+# or within R for Windows
+download.file("https://github.com/moulos-lab/metaseqr2-tutorial/raw/main/files/targets.txt","targets.txt")
 ```
 
 ## Annotation
@@ -173,6 +212,9 @@ You can download the database as follows:
 ```
 # Always in the tutorial directory
 wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/annotation.sqlite
+
+# or within R
+download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/annotation.sqlite","annotation.sqlite")
 ```
 
 ## Performing differential expression analysis

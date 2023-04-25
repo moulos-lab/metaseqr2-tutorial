@@ -543,6 +543,7 @@ library(parallel)
 library(Rsamtools)
 library(GenomicAlignments)
 library(openxlsx)
+library(metaseqR2)
 
 # The script
 source("https://github.com/moulos-lab/genomics-facility-processes/raw/main/bamstats.R")

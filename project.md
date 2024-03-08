@@ -164,5 +164,5 @@ points 1-5.
 
 ## Deadline
 
-The deadline for the project is **Sunday, 30/04/2023, end of day**. The answers 
+The deadline for the project is **Friday, 15/03/2024, end of day**. The answers 
 to the questions should be sent by e-mail to Panagiotis Moulos.

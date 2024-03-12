@@ -113,7 +113,7 @@ wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/GSE51005/Pre-Docetaxe
 # Post-docetaxel
 wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/GSE51005/Post-Docetaxel/SRR993720.bam -O Post_1.bam
 wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/GSE51005/Post-Docetaxel/SRR993720.bam.bai -O Post_1.bam.bai
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/GSE51005/Post-Docetaxel/SRR993722.bam.bam -O Post_2.bam
+wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/GSE51005/Post-Docetaxel/SRR993722.bam -O Post_2.bam
 wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/GSE51005/Post-Docetaxel/SRR993722.bam.bai -O Post_2.bam.bai
 wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/GSE51005/Post-Docetaxel/SRR993724.bam -O Post_3.bam
 wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/GSE51005/Post-Docetaxel/SRR993724.bam.bai -O Post_3.bam.bai

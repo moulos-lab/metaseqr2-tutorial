@@ -126,6 +126,9 @@ in the `tutorial` folder and then open R (e.g. RStudio) and navigate to this
 folder. Then you can use the `download.file()` R function:
 
 ```
+# Avoid download timeout
+options(timeout=max(3600,getOption("timeout")))
+
 # WT conditions
 download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367907.bam","WT_1.bam")
 download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367907.bam.bai","WT_1.bam.bai")

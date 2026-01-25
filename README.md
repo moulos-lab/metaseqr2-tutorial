@@ -70,101 +70,36 @@ will be replaced with `/home/johndoe`.
 
 # Tutorial
 
-The following sections present step-by-step instructions for data retrieval,
-creation of a text files with the targets (the BAM files with conditions) for
-metaseqR2 and the execution of the pipeline.
-
 ## Working directory
 
 Let's start by creating a working directory in `HOME` where all the operations
-will take place.
+will take place. We start by locating the `HOME` directory:
 
 ```
-HOME=/home/johndoe # Please replace this accordingly!
+echo $HOME
+# This should give /home/{first letter of your account}/{your account}
+# e.g. /home/j/johndoe
+```
+
+We create our working directory:
+
+```
+HOME=$HOME
 cd $HOME
 mkdir tutorial && cd tutorial
 ```
 
-## Data retrieval
+## Data
 
-We are using the Linux `wget` command to retrieve the BAM files and their 
-indexes, it will take some time but not too much. We are in the `tutorial` 
-directory.
-
-```
-mkdir bam && cd bam
-
-# WT conditions
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367907.bam -O WT_1.bam
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367907.bam.bai -O WT_1.bam.bai
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367908.bam -O WT_2.bam
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367908.bam.bai -O WT_2.bam.bai
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367909.bam -O WT_3.bam
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367909.bam.bai -O WT_3.bam.bai
-
-# BB condition
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367901.bam -O BB_1.bam
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367901.bam.bai -O BB_1.bam.bai
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367902.bam -O BB_2.bam
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367902.bam.bai -O BB_2.bam.bai
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367903.bam -O BB_3.bam
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367903.bam.bai -O BB_3.bam.bai
-
-# ERP condition
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367904.bam -O ERP_1.bam
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367904.bam.bai -O ERP_1.bam.bai
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367905.bam -O ERP_2.bam
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367905.bam.bai -O ERP_2.bam.bai
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367906.bam -O ERP_3.bam
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367906.bam.bai -O ERP_3.bam.bai
-
-cd ..
-```
-
-If you are running in a Windows system, you should create a folder called `bam`
-in the `tutorial` folder and then open R (e.g. RStudio) and navigate to this
-folder. Then you can use the `download.file()` R function:
-
-```
-# Avoid download timeout
-options(timeout=max(3600,getOption("timeout")))
-
-# WT conditions
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367907.bam","WT_1.bam")
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367907.bam.bai","WT_1.bam.bai")
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367908.bam","WT_2.bam")
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367908.bam.bai","WT_2.bam.bai")
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367909.bam","WT_3.bam")
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/WT/ERR3367909.bam.bai","WT_3.bam.bai")
-
-# BB condition
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367901.bam","BB_1.bam")
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367901.bam.bai","BB_1.bam.bai")
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367902.bam","BB_2.bam")
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367902.bam.bai","BB_2.bam.bai")
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367903.bam","BB_3.bam") 
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/B.burgdorferi/ERR3367903.bam.bai","BB_3.bam.bai") 
-
-# ERP condition
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367904.bam","ERP_1.bam")
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367904.bam.bai","ERP_1.bam.bai")
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367905.bam","ERP_2.bam") 
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367905.bam.bai","ERP_2.bam.bai") 
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367906.bam","ERP_3.bam")
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/PRJEB33005/Erp23/ERR3367906.bam.bai","ERP_3.bam.bai")
-```
-
-Then, within R, go to up one level to the `tutorial` directory:
-
-```
-setwd("../")
-```
+The required BAM files have already been downloaded to a common directory in the
+AUTH HPC environment for the shake of time. They are located in 
+`/mnt/appbio_a/groups/Year_4/transcriptomics/bam`
 
 ## Targets file
 
-The targets file required by metaseqR2 pipeline is a simple text tab-delimited
-file describing the samples and experimental conditions. It has the following
-columns (some are required and some are optional).
+The targets file required by the metaseqR2 pipeline is a simple text 
+tab-delimited file describing the samples and experimental conditions. It has 
+the following columns (some are required and some are optional).
 
 1. *Sample name*: this column contains a **unique** name for each sample in the
 dataset, that is one **unique** name for each BAM file. It must not contain
@@ -191,6 +126,8 @@ wget https://github.com/moulos-lab/metaseqr2-tutorial/raw/main/files/targets.txt
 
 # or within R for Windows
 download.file("https://github.com/moulos-lab/metaseqr2-tutorial/raw/main/files/targets.txt","targets.txt")
+
+
 ```
 
 ## Annotation
@@ -210,15 +147,8 @@ If we wish to analyze data from a non-supported organism, metaseqR2 can also
 accept a [GTF](https://www.ensembl.org/info/website/upload/gff.html) describing
 the genome under investigation. We will not cover this case here.
 
-You can download the database as follows:
-
-```
-# Always in the tutorial directory
-wget http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/annotation.sqlite
-
-# or within R
-download.file("http://elixir-seqcvibe.hybridstat.gr/seqc_elixir/data/annotation.sqlite","annotation.sqlite")
-```
+Again, for the shake of time, the database has been downloaded in
+`/mnt/appbio_a/groups/Year_4/transcriptomics/annotation.sqlite`
 
 ## Performing differential expression analysis
 

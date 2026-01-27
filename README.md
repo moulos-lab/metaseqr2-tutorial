@@ -139,12 +139,14 @@ wget https://github.com/moulos-lab/metaseqr2-tutorial/raw/main/files/targets.txt
 download.file("https://github.com/moulos-lab/metaseqr2-tutorial/raw/main/files/targets.txt","targets.txt")
 ```
 
-After retrieving the file, either edit it in a text editor and change `HOME` to
-your actual home directory (e.g. `/home/j/johndoe`), or use the following 
-one-liner command in the command line to change all instances at once:
+After retrieving the file, either edit it in a text editor and change 
+`HOME/tutorial/bam` to `/mnt/appbio_a/groups/Year_4/transcriptomics/bam`, 
+or use the following one-liner command in the command line to change all 
+instances at once:
 
 ```bash
-sed -i "s|HOME|$HOME|g" targets.txt
+DATA_PATH=/mnt/appbio_a/groups/Year_4/transcriptomics/bam
+sed -i "s|HOME/tutorial/bam|$DATA_PATH|g" targets.txt
 ```
 
 Make sure to inspect the file before using it with metaseqR2.

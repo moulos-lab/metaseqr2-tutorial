@@ -33,9 +33,9 @@ so this must also be installed, but it is not required.
 
 Because of time restrictions, we will not examine the step of QC or alignment to
 the reference genome. We will use existing aligned BAM files which are part of
-the [SeqCVIBE](http://elixir-seqcvibe.hybridstat.gr/seqcvibe) RNA-Seq data 
-analysis and exploration tool. If anybody is interested to learn more about 
-SeqCVIBE, information can be found in the following publication:
+the SeqCVIBE RNA-Seq data analysis and exploration tool. If anybody is 
+interested to learn more about SeqCVIBE, information can be found in the 
+following publication:
 
 > Efthimios Bothos, Pantelis Hatzis, Panagiotis Moulos: **Interactive Analysis, Exploration, and Visualization of RNA-Seq Data with SeqCVIBE**, *Methods and Protcols*, 2022, 5(2):27, DOI: [10.3390/mps5020027](https://doi.org/10.3390/mps5020027)
 
@@ -75,18 +75,28 @@ will be replaced with `/home/johndoe`.
 Let's start by creating a working directory in `HOME` where all the operations
 will take place. We start by locating the `HOME` directory:
 
-```
+```bash
 echo $HOME
-# This should give /home/{first letter of your account}/{your account}
+# This should give /home/{first letter of your account}/{your account} in the
+# AUTH HPC environment
 # e.g. /home/j/johndoe
 ```
 
 We create our working directory:
 
-```
-HOME=$HOME
+```bash
 cd $HOME
 mkdir tutorial && cd tutorial
+```
+
+## Environment initiation in HPC
+
+Load the required modules (or use RStudio provided by AUTH but this is not 
+tested):
+
+```bash
+module load gcc/14.2.0 r r-cairo
+module load gcc/14 pandoc
 ```
 
 ## Data
@@ -98,8 +108,9 @@ AUTH HPC environment for the shake of time. They are located in
 ## Targets file
 
 The targets file required by the metaseqR2 pipeline is a simple text 
-tab-delimited file describing the samples and experimental conditions. It has 
-the following columns (some are required and some are optional).
+tab-delimited file describing the samples and experimental conditions. The 
+samples correspond to BAM files containing aligned reads for these samples. It 
+has the following columns (some are required and some are optional).
 
 1. *Sample name*: this column contains a **unique** name for each sample in the
 dataset, that is one **unique** name for each BAM file. It must not contain
@@ -120,15 +131,23 @@ not important but they must be there. You can find the targets file for this
 tutorial in the `files` directory of this repository. You must change the `HOME`
 text with your working directory as mentioned above.
 
-```
+```bash
 # Always in the tutorial directory
 wget https://github.com/moulos-lab/metaseqr2-tutorial/raw/main/files/targets.txt
 
 # or within R for Windows
 download.file("https://github.com/moulos-lab/metaseqr2-tutorial/raw/main/files/targets.txt","targets.txt")
-
-
 ```
+
+After retrieving the file, either edit it in a text editor and change `HOME` to
+your actual home directory (e.g. `/home/j/johndoe`), or use the following 
+one-liner command in the command line to change all instances at once:
+
+```bash
+sed -i "s|HOME|$HOME|g" targets.txt
+```
+
+Make sure to inspect the file before using it with metaseqR2.
 
 ## Annotation
 
@@ -186,9 +205,16 @@ help(normalizeDeseq2)
 
 ### Define the targets file
 
+First, assign within R the HOME evironmental variable, required downstream as 
+your tutorial files are stored in directories therein:
+
+```R
+HOME <- Sys.getenv("HOME")
+```
+
 We create a variable pointing to the targets file we created:
 
-```
+```R
 targetsFile <- file.path(HOME,"tutorial","targets.txt")
 ```
 
@@ -200,7 +226,7 @@ Let's perform three comparisons of the "treatments":
 * Treatment with its Erp23 ligand (`ERP_vs_WT`)
 * Treatment with the Erp23 ligand agains *Borrelia burgdoferi* (`ERP_vs_BB`)
 
-```
+```R
 theContrasts <- c(
     "BB_vs_WT",
     "ERP_vs_WT",
@@ -238,7 +264,7 @@ metaseqr2(
     exportValues="normalized",
     saveGeneModel=TRUE,
     reportTop=0.1,
-    localDb=file.path(HOME,"tutorial","annotation.sqlite")
+    localDb="/mnt/appbio_a/groups/Year_4/transcriptomics/annotation.sqlite"
 )
 ```
 
@@ -348,7 +374,7 @@ metaseqr2(
     exportValues="normalized",
     saveGeneModel=TRUE,
     reportTop=0.1,
-    localDb=file.path(HOME,"tutorial","annotation.sqlite")
+    localDb="/mnt/appbio_a/groups/Year_4/transcriptomics/annotation.sqlite"
 )
 ```
 
@@ -390,7 +416,7 @@ metaseqr2(
     exportValues="normalized",
     saveGeneModel=TRUE,
     reportTop=0.1,
-    localDb=file.path(HOME,"tutorial","annotation.sqlite")
+    localDb="/mnt/appbio_a/groups/Year_4/transcriptomics/annotation.sqlite"
 )
 ```
 
@@ -443,7 +469,7 @@ metaseqr2(
     exportValues="normalized",
     saveGeneModel=TRUE,
     reportTop=0.1,
-    localDb=file.path(HOME,"tutorial","annotation.sqlite")
+    localDb="/mnt/appbio_a/groups/Year_4/transcriptomics/annotation.sqlite"
 )
 ```
 
@@ -496,3 +522,18 @@ stats <- getBamStats(targetsFile,ref=ref,rc=0.25)
 You can also get the output from 
 [here](https://github.com/moulos-lab/metaseqr2-tutorial/raw/main/files/alignment_statistics_2023-03-31-19-57-03.xlsx)
 
+## Appendix - Local setup of pandoc
+
+[Pandoc](/mnt/appbio_a/groups/Year_4/transcriptomics/annotation.sqlite) is a 
+tool for universal document converter across various formats. It is required to 
+render the interactive report produced by metaseqR2. If it is not available 
+system-wide, you can install it locally and add it to the `PATH` so it can be
+found from R:
+
+```bash
+cd $HOME
+wget https://github.com/jgm/pandoc/releases/download/3.8.3/pandoc-3.8.3-linux-amd64.tar.gz
+tar -xvf pandoc-3.8.3-linux-amd64.tar.gz
+rm pandoc-3.8.3-linux-amd64.tar.gz
+export PATH=$PATH:"/home/$(whoami | cut -c1)/$(whoami)"/pandoc-3.8.3/bin
+```
